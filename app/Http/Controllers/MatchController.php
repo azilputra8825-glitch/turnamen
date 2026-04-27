@@ -25,7 +25,9 @@ class MatchController extends Controller
     // Ambil peserta berdasarkan turnamen (untuk dropdown dinamis)
     public function getParticipants(Tournament $tournament)
     {
-        $participants = $tournament->participants()->where('status', 'active')->get();
+        $participants = $tournament->participants()
+                                ->wherePivot('status', 'confirmed')
+                                ->get();
         return response()->json($participants);
     }
 

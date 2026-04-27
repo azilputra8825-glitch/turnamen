@@ -57,19 +57,32 @@
 @endsection
 @push('scripts')
 <script>
-document.getElementById('tournamentSelect').addEventListener('change', function() {
-    const id = this.value;
-    if (!id) return;
-    fetch(`/tournaments/${id}/participants-list`)
-        .then(r => r.json())
+function loadParticipants(tournamentId) {
+    if (!tournamentId) return;
+
+    fetch(`/tournaments/${tournamentId}/participants-list`)
+        .then(response => response.json())
         .then(data => {
-            const opts = data.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
-            document.getElementById('participant1').innerHTML = '<option value="">-- Pilih --</option>' + opts;
-            document.getElementById('participant2').innerHTML = '<option value="">-- Pilih --</option>' + opts;
-        });
+            console.log('Peserta:', data); // untuk debug
+            let opts = '<option value="">-- Pilih Peserta --</option>';
+            data.forEach(p => {
+                opts += `<option value="${p.id}">${p.name}</option>`;
+            });
+            document.getElementById('participant1').innerHTML = opts;
+            document.getElementById('participant2').innerHTML = opts;
+        })
+        .catch(err => console.error('Error:', err));
+}
+
+// Saat dropdown turnamen berubah
+document.getElementById('tournamentSelect').addEventListener('change', function() {
+    loadParticipants(this.value);
 });
-// Auto-trigger jika ada tournament_id di URL
-const sel = document.getElementById('tournamentSelect');
-if (sel.value) sel.dispatchEvent(new Event('change'));
+
+// Auto-load jika sudah ada nilai terpilih
+window.addEventListener('load', function() {
+    const val = document.getElementById('tournamentSelect').value;
+    if (val) loadParticipants(val);
+});
 </script>
 @endpush

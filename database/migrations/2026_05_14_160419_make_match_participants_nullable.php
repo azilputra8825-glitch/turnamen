@@ -15,9 +15,11 @@ return new class extends Migration
             $table->dropForeign(['participant2_id']);
         });
 
-        // Jadikan nullable via raw SQL (MySQL/MariaDB XAMPP compatible)
-        DB::statement('ALTER TABLE matches MODIFY participant1_id BIGINT UNSIGNED NULL');
-        DB::statement('ALTER TABLE matches MODIFY participant2_id BIGINT UNSIGNED NULL');
+        // Jadikan nullable via Schema builder (SQLite and MySQL compatible)
+        Schema::table('matches', function (Blueprint $table) {
+            $table->unsignedBigInteger('participant1_id')->nullable()->change();
+            $table->unsignedBigInteger('participant2_id')->nullable()->change();
+        });
 
         Schema::table('matches', function (Blueprint $table) {
             $table->foreign('participant1_id')->references('id')->on('participants')->onDelete('set null');
@@ -32,8 +34,10 @@ return new class extends Migration
             $table->dropForeign(['participant2_id']);
         });
 
-        DB::statement('ALTER TABLE matches MODIFY participant1_id BIGINT UNSIGNED NOT NULL');
-        DB::statement('ALTER TABLE matches MODIFY participant2_id BIGINT UNSIGNED NOT NULL');
+        Schema::table('matches', function (Blueprint $table) {
+            $table->unsignedBigInteger('participant1_id')->change();
+            $table->unsignedBigInteger('participant2_id')->change();
+        });
 
         Schema::table('matches', function (Blueprint $table) {
             $table->foreign('participant1_id')->references('id')->on('participants')->onDelete('cascade');
